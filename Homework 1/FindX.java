@@ -36,8 +36,10 @@ The second code segment above is the correct way to check whether 0x1D is a byte
 
 */
 
+import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Random;
 
 public class FindX {
    public static String byteArrayToString(byte[] byteArray) {
@@ -60,9 +62,7 @@ public class FindX {
       int len = hexString.length();
 
       byte[] byteArray = new byte[len / 2];
-      System.out.println("The string is: " + hexString);
-      System.out.println("The length is: " + len);
-
+   
       // Check if the string is a valid hex string
       for (int i = 0; i < len; i++) {
          char c = hexString.charAt(i);
@@ -72,46 +72,85 @@ public class FindX {
       }
 
       for (int i = 0; i < len; i += 2) {
-         System.out.println("The value of i is: " + i);
+         // System.out.println("The value of i is: " + i);
          String byteString = hexString.substring(i, i + 2);
-         System.out.println("The byte string is: " + byteString);
+         // System.out.println("The byte string is: " + byteString);
          byteArray[i / 2] = (byte) Integer.parseInt(byteString, 16);
-         System.out.println();
+         // System.out.println();
       }
-
-
-      // Print the byte array
-      System.out.print("The byte array is: ");
-      for (byte b : byteArray) {
-         System.out.print((b & 0xFF) + " ");
-      }
-      System.out.println();
 
       return byteArray;
    }
 
    public static String hexString_To_SHA256String(String hexString) {
+      return byteArrayToString(byteArray_To_SHA256ByteArray((hexStringToByteArray(hexString))));
+   }
+
+   public static byte[] byteArray_To_SHA256ByteArray(byte[] byteArray) {
       try {
          MessageDigest digest = MessageDigest.getInstance("SHA-256");
 
-         byte[] hash = digest.digest(hexStringToByteArray(hexString));
+         byte[] hash = digest.digest(byteArray);
 
-         return byteArrayToString(hash);
+         return hash;
       } catch (NoSuchAlgorithmException e) {
          throw new RuntimeException(e);
       }
    }
 
-   public static String concatenateHexString(String x, String id) {
-      // return byteArrayToString(x.getBytes()) + byteArrayToString(id.getBytes());
-      return byteArrayToString(x.getBytes());
+   public static byte[] concatenateHexString_toByteArray(String x, String id) {
+      byte[] xArray = hexStringToByteArray(x);
+      byte[] idArray = hexStringToByteArray(id);
+
+      return concatenateByteArray_toArray(xArray, idArray);
+   }
+
+   public static byte[] concatenateByteArray_toArray(byte[] x, byte[] id) {
+      byte[] concatenatedArray = new byte[x.length + id.length];
+
+      System.arraycopy(x, 0, concatenatedArray, 0, x.length);
+      System.arraycopy(id, 0, concatenatedArray, x.length, id.length);
+
+      return concatenatedArray;
+   }
+
+   public static boolean checkIfContains2F(byte[] byteArray) {
+      for (byte b : byteArray) {
+         if (b == 0x2F) {
+            return true;
+         }
+      }
+      return false;
    }
 
    public static void main(String[] args) {
-      // System.out.println(hexString_To_SHA256String("ff"));
-
       String id = "ED00AF5F774E4135E7746419FEB65DE8AE17D6950C95CEC3891070FBB5B03C78";
+      byte[] idArray = hexStringToByteArray(id);
 
-      System.out.println(concatenateHexString("A0", "1DF"));
+      // Get X
+      Random rand = new Random();
+      
+      int counter = 0;
+
+      while (true) {
+         // Determine x length
+         int xLength = rand.nextInt(64);
+         if (xLength > 0) {
+            byte[] xArray = new byte[xLength];
+            rand.nextBytes(xArray);
+            counter++;
+
+            byte[] concatenatedArray = concatenateByteArray_toArray(xArray, idArray);
+            byte[] SHA256Array = byteArray_To_SHA256ByteArray(concatenatedArray);
+
+
+            if (checkIfContains2F(SHA256Array)) {
+               System.out.println("X: " + byteArrayToString(xArray));
+               System.out.println("SHA-256: " + byteArrayToString(SHA256Array));
+               System.out.println("Counter: " + counter);
+               break;
+            }
+         }  
+      }
    }
 }
