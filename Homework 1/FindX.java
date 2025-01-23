@@ -52,18 +52,40 @@ public class FindX {
       return hexString.toString();
    }
 
-   public static byte[] hexStringToByteArray(String hexString) {
+   public static byte[] hexStringToByteArray(String hexString) throws IllegalArgumentException {
       
+      if (hexString.length() % 2 != 0) {
+         hexString = "0" + hexString;
+      }
       int len = hexString.length();
+
       byte[] byteArray = new byte[len / 2];
+      System.out.println("The string is: " + hexString);
+      System.out.println("The length is: " + len);
 
-
-      for (int i = 0; i < len; i += 2) {
-         String byteString = hexString.substring(i, i + 2);
-         byteArray[i / 2] = (byte) Integer.parseInt(byteString, 16);
+      // Check if the string is a valid hex string
+      for (int i = 0; i < len; i++) {
+         char c = hexString.charAt(i);
+         if (!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f'))) {
+            throw new IllegalArgumentException("Invalid hex string");
+         }
       }
 
-      System.out.println("************************************************\n" + byteArray + "\n************************************************\n");
+      for (int i = 0; i < len; i += 2) {
+         System.out.println("The value of i is: " + i);
+         String byteString = hexString.substring(i, i + 2);
+         System.out.println("The byte string is: " + byteString);
+         byteArray[i / 2] = (byte) Integer.parseInt(byteString, 16);
+         System.out.println();
+      }
+
+
+      // Print the byte array
+      System.out.print("The byte array is: ");
+      for (byte b : byteArray) {
+         System.out.print((b & 0xFF) + " ");
+      }
+      System.out.println();
 
       return byteArray;
    }
@@ -86,7 +108,7 @@ public class FindX {
    }
 
    public static void main(String[] args) {
-      System.out.println(hexString_To_SHA256String("你"));
+      // System.out.println(hexString_To_SHA256String("ff"));
 
       String id = "ED00AF5F774E4135E7746419FEB65DE8AE17D6950C95CEC3891070FBB5B03C78";
 
