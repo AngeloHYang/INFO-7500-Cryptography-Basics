@@ -1,6 +1,6 @@
 version: "3"
 
-name: bitcoind
+name: bitcoind-hanpeng
 
 services:
   bitcoind:
