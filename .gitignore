@@ -24,3 +24,4 @@ hs_err_pid*
 replay_pid*
 Homework 2/secrets.toml
 *.pyc
+/Homework 3/bitcoin-data
