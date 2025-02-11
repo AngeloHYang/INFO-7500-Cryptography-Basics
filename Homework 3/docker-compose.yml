@@ -1,0 +1,17 @@
+version: 3
+
+services:
+  bitcoind:
+    build: .
+    ports:
+      - "8332:8332"
+      - "8333:8333"
+    volumes:
+      - bitcoin-data:/bitcoin-data
+    restart: unless-stopped
+    stop_grace_period: 10m
+
+volumes:
+  bitcoin-data:
+    driver: local
+    source: ~/bitcoin-data
