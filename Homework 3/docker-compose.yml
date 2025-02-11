@@ -1,4 +1,6 @@
-version: 3
+version: "3"
+
+name: bitcoind
 
 services:
   bitcoind:
@@ -14,4 +16,7 @@ services:
 volumes:
   bitcoin-data:
     driver: local
-    source: ~/bitcoin-data
+    driver_opts:
+      type: none
+      device: ./bitcoin-data
+      o: bind
